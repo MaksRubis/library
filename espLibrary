@@ -1,0 +1,67 @@
+local players = game:GetService("Players")
+local player  = players.LocalPlayer
+
+local ESP = {
+    playerAddedConnection = nil,
+
+    settings = {
+        fillC = nil,
+        outlineC = nil,
+        fillT = nil
+    }
+}
+
+getgenv().espEnabled = true
+
+function ESP.onAdded(char)
+    ESP.Draw(char,ESP.settings)
+end 
+
+function ESP.clean()
+    getgenv().espEnabled = false 
+
+    if ESP.playerAddedConnection then 
+        ESP.playerAddedConnection:Disconnect()
+        warn("ESP Connection Disconnected succesfully!\n--------")
+    end    
+
+    for i,v in players:GetPlayers() do 
+        if v ~= player and v.Character and v.Character:FindFirstChild("Nigger") then 
+            v.Character.Nigger:Remove()
+            warn("ESP Cleaned in " .. v.Name)
+        end 
+    end 
+end
+
+function ESP.Draw(char,settings)
+    local highlight = Instance.new("Highlight")
+    highlight.Parent = char
+    highlight.FillColor = settings.fillC or Color3.new(255,255,255)
+    highlight.OutlineColor = settings.outlineC or Color3.new(0,1,0)
+    highlight.FillTransparency = settings.fillT or 0
+    highlight.Name = "Nigger"
+    
+end
+
+
+function ESP.Init()
+    warn("Esp Init")
+    getgenv().espEnabled = true
+
+    ESP.playerAddedConnection = players.PlayerAdded:Connect(function(p)
+        p.CharacterAdded:Connect(ESP.onAdded)
+    end)
+
+    while getgenv().espEnabled do task.wait(1)
+        if not getgenv().espEnabled then ESP.clean() return end 
+
+        for i,v in players:GetPlayers() do 
+            if v ~= player and v.Character and v.Character:FindFirstChild("Nigger") == nil then 
+                ESP.Draw(v.Character,ESP.settings)
+            end 
+        end 
+
+    end 
+end
+
+return ESP 
