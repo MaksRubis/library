@@ -1,13 +1,9 @@
 # ESP Library by tuporily daun
 
-[+]: Added Teamcheck 
+14.12.2025:
 
-[/]: Full Recode
+[+]:Added Teamcheck  
+[/]:Full Recode  
+[/]:Fixed memory leaks  
+[/]:Fixed _cleanUp not working
 
-[/]: Fixed memory leaks
-
-To do:
-
-Fix highlights not removing
-
-Fix connections not disconnecting
