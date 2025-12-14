@@ -47,13 +47,14 @@ function ESP._draw(char,plr)
     highlight.FillTransparency = ESP.settings.fillTransparency
 
     local ancCheck = char.AncestryChanged:Connect(function()
-        if char:IsDescendantOf(game) == nil then 
-            table.remove(ESP.highlights,highlight)
+        if not char:IsDescendantOf(game) then 
+            ESP.highlights[char] = nil 
         end 
     end)
 
-    table.insert(ESP.connections,ancCheck)
-    table.insert(ESP.highlights,highlight)
+    table.insert(ESP.connections, ancCheck)
+    ESP.highlights[char] = highlight 
+
 end
 
 function ESP._onCharacterAdded(char,plr)
@@ -66,6 +67,10 @@ function ESP._onPlayerAdded(pl)
     end)
 
     table.insert(ESP.connections,characterAddedConnection)
+
+    if pl.Character then 
+        ESP._onCharacterAdded(pl.Character,pl)
+    end 
 end
 
 function ESP._cleanUp()
@@ -101,19 +106,9 @@ function ESP._init()
 
     -- add current players 
     for i,v in players:GetPlayers() do 
-        if v.Character then
-            ESP._draw(v.Character,v)
-        end
         ESP._onPlayerAdded(v)
     end 
     
-
-    -- memory cleanUp
-    repeat
-        return    
-    until getgenv().espEnabled == false
-
-    ESP._cleanUp()
 end
 
 ESP._init()
