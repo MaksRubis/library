@@ -2,107 +2,118 @@ local players = game:GetService("Players")
 local player  = players.LocalPlayer
 
 local ESP = {
-    playerAddedConnection = nil,
-    characterAddedConnection = nil,
+    connections = {},
+    highlights = {},
 
+    
     settings = {
-        teamCheck = true,
+        teamCheck = false,
 
-        fillC = nil,
-        outlineC = nil,
-        fillT = nil
+        enemyFillColor = Color3.new(1, 0, 0),   
+        enemyOutlineColor = Color3.new(0.24, 0.02, 0.02),
+        teamFillColor = Color3.new(0, 1, 0),        
+        teamOutlineColor = Color3.new(0.03, 0.24, 0.02),
+        noTeamFillColor = Color3.new(1, 1, 0),      
+        noTeamOutlineColor = Color3.new(0.24, 0.24, 0.02),
+        fillTransparency = 0.5
     }
 }
 
-getgenv().espEnabled = true
+getgenv().espEnabled = false
 
-function ESP.onAdded(char)
-    ESP.Draw(char,ESP.settings)
-end 
 
-function ESP.clean()
-    getgenv().espEnabled = false 
+function ESP._draw(char,plr)
+    if not char then return end 
 
-    if ESP.playerAddedConnection then 
-        ESP.playerAddedConnection:Disconnect()
-        warn("ESP Connection Disconnected")
-    end    
-
-    if ESP.characterAddedConnection then 
-        ESP.characterAddedConnection:Disconnect()
-        warn("ESP Connection Disconnected")
-    end 
-
-    for i,v in players:GetPlayers() do 
-        if v ~= player and v.Character and v.Character:FindFirstChild("Nigger") then 
-            v.Character.Nigger:Remove()
-            warn("ESP Cleaned in " .. v.Name)
-        end 
-    end 
-end
-
-function ESP.Draw(char,settings)
     local highlight = Instance.new("Highlight")
     highlight.Parent = char
-    highlight.FillColor = settings.fillC or Color3.new(0.019607, 0.670588, 0.815686)
-    highlight.OutlineColor = settings.outlineC or Color3.new(0,1,0)
-    highlight.FillTransparency = settings.fillT or 0
-    highlight.Name = "Nigger"
-    
-end
+    highlight.Name = "ESPHighlight"
+    highlight.FillColor = ESP.settings.noTeamFillColor
+    highlight.OutlineColor = ESP.settings.noTeamOutlineColor
 
-function ESP.teamCheck(char)
-    if not ESP.settings.teamCheck then return end
+    local myTeam = player.Team 
+    local enemyTeam = plr.Team
 
-    local parentName = char.Parent.Name
+    if ESP.teamCheck then
+        if enemyTeam == myTeam then 
+            highlight.FillColor = ESP.settings.teamFillColor
+            highlight.OutlineColor = ESP.settings.teamOutlineColor
+        else 
+            highlight.FillColor = ESP.settings.enemyFillColor
+            highlight.OutlineColor = ESP.settings.enemyOutlineColor
+        end 
+    end
 
-    if parentName == "IIoooIIl" then 
-        return "defender"
-    elseif parentName == "lIIooolll" then
-        return "attacker"
-    end 
+    highlight.FillTransparency = ESP.settings.fillTransparency
 
-end
-
-
-
-function ESP.Init()
-    warn("Esp Init")
-    getgenv().espEnabled = true
-
-    ESP.playerAddedConnection = players.PlayerAdded:Connect(function(p)
-        ESP.characterAddedConnection = p.CharacterAdded:Connect(ESP.onAdded)
+    local ancCheck = char.AncestryChanged:Connect(function()
+        if char:IsDescendantOf(game) == nil then 
+            table.remove(ESP.highlights,highlight)
+        end 
     end)
 
-    while getgenv().espEnabled do task.wait(1)
-        if not getgenv().espEnabled then ESP.clean() return end 
-
-        for i,v in players:GetPlayers() do 
-            if v ~= player and v.Character and v.Character:FindFirstChild("Nigger") == nil then 
-                local vTeam = ESP.teamCheck(v.Character)
-                local myTeam = ESP.teamCheck(player.Character)
-
-                local settings
-
-                if vTeam == myTeam and vTeam ~= nil then
-                    settings = {
-                        fillC = Color3.new(0, 1, 0),
-                        outlineC = Color3.new(0.03, 0.24, 0.02),
-                        fillT = 0.5
-                    }
-                else
-                    settings = {
-                        fillC = Color3.new(1, 0, 0),
-                        outlineC = Color3.new(0.24, 0.02, 0.02),
-                        fillT = 0.5
-                    }
-                end
-
-                ESP.Draw(v.Character,settings)
-            end 
-        end 
-
-    end 
+    table.insert(ESP.connections,ancCheck)
+    table.insert(ESP.highlights,highlight)
 end
 
-return ESP 
+function ESP._onCharacterAdded(char,plr)
+    ESP._draw(char,plr)
+end
+
+function ESP._onPlayerAdded(pl)
+    local characterAddedConnection = pl.CharacterAdded:Connect(function(char)
+        ESP._onCharacterAdded(char,pl)
+    end)
+
+    table.insert(ESP.connections,characterAddedConnection)
+end
+
+function ESP._cleanUp()
+    getgenv().espEnabled = false
+
+    for i,v in ESP.connections do 
+        if v then 
+            v:Disconnect()
+        end 
+    end 
+    ESP.connections = {}
+    warn("Connections Cleaned")
+
+    for i,v in ESP.highlights do 
+        if v then 
+            v:Remove()
+        end 
+    end 
+    ESP.highlights = {}
+
+    warn("Esp Removed!")
+end
+
+function ESP._init()
+    getgenv().espEnabled = true
+
+    -- add joined players
+    local playerAddedConnection = players.PlayerAdded:Connect(function(pl)
+        ESP._onPlayerAdded(pl)
+    end)
+
+    table.insert(ESP.connections,playerAddedConnection)
+
+    -- add current players 
+    for i,v in players:GetPlayers() do 
+        if v.Character then
+            ESP._draw(v.Character,v)
+        end
+        ESP._onPlayerAdded(v)
+    end 
+    
+
+    -- memory cleanUp
+    repeat
+        return    
+    until getgenv().espEnabled == false
+
+    ESP._cleanUp()
+end
+
+ESP._init()
