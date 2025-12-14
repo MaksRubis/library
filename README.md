@@ -1,5 +1,10 @@
 # ESP Library by tuporily daun
 
-[+]: Added Teamcheck for one game
+[+]: Added Teamcheck 
 
-[Real]: Shit code Need full recode
+[/]: Full Recode
+[/]: Fixed memory leaks
+
+To do:
+Fix highlights not removing
+Fix connections not disconnecting
