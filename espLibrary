@@ -52,13 +52,16 @@ function ESP.Draw(char,settings)
 end
 
 function ESP.teamCheck(char)
-    if ESP.settings.teamCheck then 
-        if char.Parent == "IIoooIIl" then --defender
-            return "defender"
-        elseif char.Parent == "lIIooolll" then -- attackers
-            return "attacker"
-        end 
+    if not ESP.settings.teamCheck then return end
+
+    local parentName = char.Parent.Name
+
+    if parentName == "IIoooIIl" then 
+        return "defender"
+    elseif parentName == "lIIooolll" then
+        return "attacker"
     end 
+
 end
 
 
@@ -79,21 +82,23 @@ function ESP.Init()
                 local vTeam = ESP.teamCheck(v.Character)
                 local myTeam = ESP.teamCheck(player.Character)
 
-                if vTeam == "defender" and myTeam == "defender" and ESP.settings.teamCheck then 
-                    ESP.settings = {
-                        fillC = Color3.new(0, 0.988235, 0.031372),
-                        outlineC = Color3.new(0.027450, 0.243137, 0.023529),
-                        fillT = 0.5
-                    }
-                else 
-                    ESP.settings = {
-                        fillC = Color3.new(0.988235, 0, 0),
-                        outlineC = Color3.new(0.243137, 0.023529, 0.023529),
-                        fillT = 0.5
-                    }
-                end 
+                local settings
 
-                ESP.Draw(v.Character,ESP.settings)
+                if vTeam == myTeam and vTeam ~= nil then
+                    settings = {
+                        fillC = Color3.new(0, 1, 0),
+                        outlineC = Color3.new(0.03, 0.24, 0.02),
+                        fillT = 0.5
+                    }
+                else
+                    settings = {
+                        fillC = Color3.new(1, 0, 0),
+                        outlineC = Color3.new(0.24, 0.02, 0.02),
+                        fillT = 0.5
+                    }
+                end
+
+                ESP.Draw(v.Character,settings)
             end 
         end 
 
