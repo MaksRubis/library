@@ -6,5 +6,8 @@
 [/]:Full Recode  
 [/]:Fixed memory leaks  
 [/]:Fixed _cleanUp not working
+[/]:fix stupid bug
+
+esp status: bad
 
 my discord: q3v3
