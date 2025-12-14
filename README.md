@@ -5,7 +5,7 @@
 [+]:Added Teamcheck  
 [/]:Full Recode  
 [/]:Fixed memory leaks  
-[/]:Fixed _cleanUp not working
+[/]:Fixed _cleanUp not working  
 [/]:fix stupid bug
 
 esp status: bad
