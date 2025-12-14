@@ -1,4 +1,5 @@
-# library
+# ESP Library by tuporily daun
 
-[+]: Added Teamcheck for one game\n 
-[/]: Shit code Need full recode
+[+]: Added Teamcheck for one game
+
+[Real]: Shit code Need full recode
