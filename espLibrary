@@ -34,7 +34,7 @@ function ESP._draw(char,plr)
     local myTeam = player.Team 
     local enemyTeam = plr.Team
 
-    if ESP.teamCheck then
+    if ESP.settings.teamCheck then
         if enemyTeam == myTeam then 
             highlight.FillColor = ESP.settings.teamFillColor
             highlight.OutlineColor = ESP.settings.teamOutlineColor
@@ -108,7 +108,15 @@ function ESP._init()
     for i,v in players:GetPlayers() do 
         ESP._onPlayerAdded(v)
     end 
+
+    repeat task.wait(0.5)
+
+    until getgenv().espEnabled == false 
     
+    ESP._cleanUp()
 end
+
+
+
 
 return ESP
