@@ -10,6 +10,16 @@
 [/]:fix stupid bug
 ```
 
-esp status: bad
+15.12.2025:
+```
+[/]:Fix teamcheck not working  
+[/]:Fix highlight not removing and connections
+```
+
+List to do
+```
+Add Tracers  
+Add object esp 
+```
 
 my discord: q3v3
